@@ -1,8 +1,10 @@
 #include "Matrix.h"
+#include "Utility.h"
 
 #include <iostream>
+#include <stack>	// for std::stack
 
-GraphAdjacencyMatrix::GraphAdjacencyMatrix(int vertices, int edges) {
+MatrixGraph::MatrixGraph(int vertices, int edges) {
 	V = vertices;
 	E = edges;
 
@@ -14,11 +16,14 @@ GraphAdjacencyMatrix::GraphAdjacencyMatrix(int vertices, int edges) {
 			matrix[row][col] = 0;
 		}
 	}
+	degree = new int[V];
 }
 
-GraphAdjacencyMatrix::GraphAdjacencyMatrix(std::vector<std::pair<int, int>>& data) {
+MatrixGraph::MatrixGraph(std::vector<std::pair<int, int>>& data) {
 	V = data[0].first;
 	E = data[0].second;
+
+	degree = new int[V];
 
 	// Allocate memory and make each M[i, j] = 0
 	matrix = new int* [V];
@@ -35,20 +40,23 @@ GraphAdjacencyMatrix::GraphAdjacencyMatrix(std::vector<std::pair<int, int>>& dat
 	}
 }
 
-GraphAdjacencyMatrix::~GraphAdjacencyMatrix() {
+MatrixGraph::~MatrixGraph() {
 	for (size_t i{ 0 }; i < V; ++i) {
 		delete[] matrix[i];
 	}
 	delete[] matrix;
+	delete[] degree;
 }
 
-void GraphAdjacencyMatrix::addEdge(int first, int second) {
+void MatrixGraph::addEdge(int first, int second) {
 	matrix[first - 1][second - 1] = 1;
 	matrix[second - 1][first - 1] = 1;
+	degree[first - 1]++;
+	degree[second - 1]++;
 }
 
-void GraphAdjacencyMatrix::printMatrix() {
-	std::cout << "Printing 2D representation of a graph's adjacency matrix: " << '\n';
+void MatrixGraph::printMatrix() {
+	std::cout << "Printing 2D representation of undirected graph's adjacency matrix: " << '\n';
 	std::cout << '\n';
 	for (size_t row = 0; row < V; ++row) {
 		for (size_t col = 0; col < V; ++col) {
@@ -59,9 +67,8 @@ void GraphAdjacencyMatrix::printMatrix() {
 	std::cout << '\n';
 }
 
-bool GraphAdjacencyMatrix::hamiltonCycle() {
+bool MatrixGraph::hamiltonCycle() {
 	std::vector<int> path(V, -1);
-
 	// Mark path[0] with starting vertex 0
 	path[0] = 0;
 	// Traverse the graph with first empty position set to 1
@@ -75,13 +82,12 @@ bool GraphAdjacencyMatrix::hamiltonCycle() {
 }
 
 // Utility function to check if the 'vertex' can be added at index 'position' (1 to V)
-bool GraphAdjacencyMatrix::canBeAdded(int vertex, std::vector<int> &path, int position) {
+bool MatrixGraph::canBeAdded(int vertex, std::vector<int> &path, int position) {
 	// Check if the vertex is adjacent
 	// to the previous one from the 'path'
 	if (matrix[path[position - 1]][vertex] == 0) {
 		return false;
 	}
-
 	// Check if the vertex has already 
 	// been included in the 'path'
 	for (int i = 0; i < position; ++i) {
@@ -89,11 +95,11 @@ bool GraphAdjacencyMatrix::canBeAdded(int vertex, std::vector<int> &path, int po
 			return false;
 		}
 	}
-
+	// If the 'vertex' can be added at 'position' return true
 	return true;
 }
 
-bool GraphAdjacencyMatrix::hamiltonUtil(std::vector<int> &path, int position) {
+bool MatrixGraph::hamiltonUtil(std::vector<int> &path, int position) {
 	// If all vertices are included in the path
 	if (position == V) {
 		// Check if there exists an edge from the last 
@@ -117,7 +123,7 @@ bool GraphAdjacencyMatrix::hamiltonUtil(std::vector<int> &path, int position) {
 				return true;
 			}
 			// If the added vertex does not help with finding the solution remove it
-			path[position] = -1;
+			path.at(position) = -1;
 		}
 	}
 
@@ -125,46 +131,24 @@ bool GraphAdjacencyMatrix::hamiltonUtil(std::vector<int> &path, int position) {
 	return false;
 }
 
-// Utility function to print Hamiltonian path
-void GraphAdjacencyMatrix::printPathHamilton(std::vector<int> &path) {
-	for (const auto& vertex : path) {
-		std::cout << vertex + 1 << " -> ";
-	}
-	std::cout << path.front() + 1 << '\n';
-}
-
-// Utility function to print Euler path
-// Template is as follows
-// i--j -> j--x -> x--i
-void GraphAdjacencyMatrix::printPathEuler(std::vector<int>& path) {
-	std::string printedArrow = " -> ";
-	for (int i = 0; i < path.size() - 1; ++i) {
-		if (i == path.size() - 2) {
-			printedArrow = "";
-		}
-		std::cout << path.at(i) + 1 << "--" << path.at(i + 1) + 1 << printedArrow;
-	}
-	std::cout << '\n';
-}
-
-// Utility function to traverse the graph using DFS method
-void GraphAdjacencyMatrix::eulerUtil(int current, std::vector<int>& path) {
+// Utility function to traverse the graph using DFS post-order method
+void MatrixGraph::eulerUtil(int vertex, std::vector<int>& path) {
 	// For each vertex check it's connection and then remove them
-	for (int vertex = 0; vertex < V; ++vertex) {
-		if (matrix[current][vertex] == 1) {
-			matrix[current][vertex] -= 1;
+	for (int current = 0; current < V; ++current) {
+		if (matrix[vertex][current] == 1) {
 			matrix[vertex][current] -= 1;
-			eulerUtil(vertex, path);
+			matrix[current][vertex] -= 1;
+			eulerUtil(current, path);
 		}
 	}
-	// Emplace current path
-	path.emplace_back(current);
+	// Emplace vertex in the path
+	path.emplace_back(vertex);
 }
 
-void GraphAdjacencyMatrix::DFS(int vertex, std::vector<bool>& visited) {
+void MatrixGraph::DFS(int vertex, std::vector<bool>& visited) {
 	visited[vertex] = true;
 	for (int current = 0; current < V; ++current) {
-		if (visited[current] == false && matrix[current][vertex] == 1) {
+		if (!visited[current] && matrix[vertex][current] == 1) {
 			DFS(current, visited);
 		}
 	}
@@ -172,45 +156,38 @@ void GraphAdjacencyMatrix::DFS(int vertex, std::vector<bool>& visited) {
 
 // Function to check the conectivity whether a graph
 // is connected or not - using DFS algoirithm
-bool GraphAdjacencyMatrix::isConnected() {
-	std::vector<bool> visited(V, false);
-	DFS(0, visited);
+bool MatrixGraph::isConnected() {
+	for (int vertex = 0; vertex < V; ++vertex) {
+		std::vector<bool> visited(V, false);
+		DFS(vertex, visited);
+		if (std::find(visited.begin(), visited.end(), false) != visited.end()) {
+			return false;
+		}
+	}
 
-	return V == visited.size();
+	return true;
 }
 
-GraphType GraphAdjacencyMatrix::checkGraphType() {
+bool MatrixGraph::isEulerian() {
 	// Check if the graph is connected
 	if (!isConnected()) {
-		return NOT_EULER;
+		return false;
 	}
-
-	// Count vertices with odd degree
-	int odd_count = 0;
-	for (int row = 0; row < V; ++row) {
-		int row_sum = matrix[row][0];
-		for (int col = 1; col < V; ++col) {
-			row_sum += matrix[row][col];
-		}
-		if (row_sum & 1) {
-			odd_count++;
+	// Undirected graph has Eulerian circuit only if
+	// all the vertices have even degree
+	for (int vertex = 0; vertex < V; ++vertex) {
+		if (degree[vertex] % 2 == 1) {
+			return false;
 		}
 	}
-
-	// If odd_count is more than 2 then graph is not Eulerian
-	if (odd_count > 2) {
-		return NOT_EULER;
-	}
-
-	// Return SEMI_EULER if has exactly 2 odd degree vertices
-	// Return FULL_EULER if has all of the vertices degrees are even
-	return (odd_count) ? SEMI_EULER : FULL_EULER;
+	return true;
 }
 
-bool GraphAdjacencyMatrix::eulerCycle() {
-	if (checkGraphType() == FULL_EULER) {
+bool MatrixGraph::eulerCycle() {
+	if (isEulerian()) {
 		std::vector<int> path;
 		eulerUtil(0, path);
+		std::cout << "Eulerian circuit: ";
 		printPathEuler(path);
 		return true;
 	}

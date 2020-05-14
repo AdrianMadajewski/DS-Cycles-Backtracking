@@ -3,40 +3,32 @@
 
 #include <vector>	// for std::vector
 #include <utility>	// for std::pair
+#include <stack>	// for std::stack
 
-enum GraphType {
-	NOT_EULER,
-	SEMI_EULER,
-	FULL_EULER,
-};
-
-class GraphAdjacencyMatrix {
+class MatrixGraph {
 public:
-	GraphAdjacencyMatrix(int vertices, int edges);
-	GraphAdjacencyMatrix(std::vector<std::pair<int, int>>& data);
-	~GraphAdjacencyMatrix();
+	MatrixGraph(int vertices, int edges);
+	MatrixGraph(std::vector<std::pair<int, int>>& data);
+	~MatrixGraph();
 	void addEdge(int first, int second);
 	void printMatrix();
 	bool hamiltonCycle();
 	bool eulerCycle();
 private:
-	size_t V;		// No. of vertices
-	size_t E;		// No. of edges
+	int V;			// No. of vertices
+	int E;			// No. of edges
 	int** matrix;	// 2D-array to store connections
+	int* degree;	// Array to store degree of each vertex
 
 	// Hamilton
+	bool canBeAdded(int vertex, std::vector<int>& path, int position);
 	bool hamiltonUtil(std::vector<int> &path, int position);
 	
 	// Euler
-	bool canBeAdded(int vertex, std::vector<int>& path, int position);
 	void eulerUtil(int vertex, std::vector<int>& path);
-	GraphType checkGraphType();
+	bool isEulerian();
 	bool isConnected();
-	void DFS(int source, std::vector<bool> &visited);
-
-	// Utility
-	void printPathHamilton(std::vector<int>& path);
-	void printPathEuler(std::vector<int>& path);
+	void DFS(int vertex, std::vector<bool> &visited);
 };
 
 #endif // !MATRIX_H
