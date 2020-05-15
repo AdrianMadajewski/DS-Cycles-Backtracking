@@ -2,7 +2,6 @@
 #include "Utility.h"
 
 #include <iostream>
-#include <stack>	// for std::stack
 
 MatrixGraph::MatrixGraph(int vertices, int edges) {
 	V = vertices;
@@ -16,14 +15,17 @@ MatrixGraph::MatrixGraph(int vertices, int edges) {
 			matrix[row][col] = 0;
 		}
 	}
-	degree = new int[V];
+
+	// Allocate memory for each vertex degree
+	degree = new int[V]{};
 }
 
 MatrixGraph::MatrixGraph(std::vector<std::pair<int, int>>& data) {
 	V = data[0].first;
 	E = data[0].second;
 
-	degree = new int[V];
+	// Allocate memory for each vertex degree
+	degree = new int[V]{};
 
 	// Allocate memory and make each M[i, j] = 0
 	matrix = new int* [V];
@@ -65,20 +67,6 @@ void MatrixGraph::printMatrix() {
 		std::cout << '\n';
 	}
 	std::cout << '\n';
-}
-
-bool MatrixGraph::hamiltonCycle() {
-	std::vector<int> path(V, -1);
-	// Mark path[0] with starting vertex 0
-	path[0] = 0;
-	// Traverse the graph with first empty position set to 1
-	if (!hamiltonUtil(path, 1)) {
-		std::cout << "Cannot find Hamiltonian circuit." << '\n';
-		return false;
-	}
-
-	printPathHamilton(path);
-	return true;
 }
 
 // Utility function to check if the 'vertex' can be added at index 'position' (1 to V)
@@ -131,13 +119,28 @@ bool MatrixGraph::hamiltonUtil(std::vector<int> &path, int position) {
 	return false;
 }
 
+bool MatrixGraph::hamiltonCycle() {
+	std::vector<int> path(V, -1);
+	// Mark path[0] with starting vertex 0
+	path[0] = 0;
+	// Traverse the graph with first empty position set to 1
+	if (!hamiltonUtil(path, 1)) {
+		std::cout << "Cannot find Hamiltonian circuit." << '\n';
+		return false;
+	}
+
+	printPathHamilton(path);
+	return true;
+}
+
 // Utility function to traverse the graph using DFS post-order method
 void MatrixGraph::eulerUtil(int vertex, std::vector<int>& path) {
 	// For each vertex check it's connection and then remove them
 	for (int current = 0; current < V; ++current) {
 		if (matrix[vertex][current] == 1) {
-			matrix[vertex][current] -= 1;
-			matrix[current][vertex] -= 1;
+			// Remove connections
+			matrix[vertex][current]--;
+			matrix[current][vertex]--;
 			eulerUtil(current, path);
 		}
 	}

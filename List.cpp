@@ -8,16 +8,16 @@ ListGraph::ListGraph(int vertices, int edges) {
 	V = vertices;
 	E = edges;
 	succ = new std::list<int>[V];
-	in = new int[V];
-	out = new int[V];
+	in = new int[V]{};
+	out = new int[V]{};
 }
 
 ListGraph::ListGraph(const std::vector<std::pair<int, int>>& data) {
 	V = data[0].first;
 	E = data[0].second;
 	succ = new std::list<int>[V];
-	in = new int[V];
-	out = new int[V];
+	in = new int[V]{};
+	out = new int[V]{};
 	for (int i = 1; i <= E; ++i) {
 		addEdge(data[i].first, data[i].second);
 	}
@@ -74,7 +74,7 @@ bool ListGraph::isConnected() {
 void ListGraph::eulerUtil(int vertex, std::vector<int>& path) {
 	while (!succ[vertex].empty()) {
 		int current = succ[vertex].front();
-		// Remove connection if hasnt been visisted
+		// Remove connection from 'vertex'
 		succ[vertex].pop_front();
 		eulerUtil(current, path);
 	}
@@ -94,17 +94,15 @@ bool ListGraph::eulerCycle() {
 }
 
 bool ListGraph::hasEulerianCircuit() {
-	int startNodes = 0;
-	int endNodes = 0;
-
 	if (!isConnected()) 
 		return false;
 
+	// Has Eulerian circuit if all vertices has the same in/out degree
 	for (int vertex = 0; vertex < V; ++vertex) {
-		if (out[vertex] - in[vertex] > 1 || in[vertex] - out[vertex] > 1) return false;
-		else if (out[vertex] - in[vertex] == 1) startNodes++;
-		else if (in[vertex] - out[vertex] == 1) endNodes++;
+		if (out[vertex] != in[vertex]) {
+			return false;
+		}
 	}
-	// Has Eulerian circuit (not path) if all vertices has the same in/out degree
-	return (endNodes == 0 && startNodes == 0);
+	
+	return true;
 }
