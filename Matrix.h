@@ -8,7 +8,7 @@
 class MatrixGraph {
 public:
 	MatrixGraph(int vertices, int edges);
-	MatrixGraph(std::vector<std::pair<int, int>>& data);
+	MatrixGraph(const std::vector<std::pair<int, int>>& data);
 	~MatrixGraph();
 	void addEdge(int first, int second);
 	void printMatrix();

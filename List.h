@@ -12,9 +12,8 @@ public:
 	~ListGraph();
 	void addEdge(int first, int second);
 	void printSuccList();
-	void eulerUtil(int vertex, std::vector<int>& path);
 	bool eulerCycle();
-	bool hasEulerianCircuit();
+	bool hamiltonCycle();
 private:
 	int V;					// No. of vertices
 	int E;					// No. of edges
@@ -22,8 +21,15 @@ private:
 	int* in;				// in-degree of each vertex
 	int* out;				// out-degree of each vertex
 
+	// Hamilton
+	bool hamiltonUtil(std::vector<int> &path, int position);
+	bool canBeAdded(int vertex, std::vector<int>& path, int position);
+
+	// Euler
 	void DFS(int vertex, std::vector<bool>& visited);
+	bool hasEulerianCircuit();
 	bool isConnected();
+	void eulerUtil(int vertex, std::vector<int>& path);
 };
 
 #endif // !LIST_H

@@ -72,3 +72,25 @@ std::vector<std::pair<int, int>> getUserPairs(const std::string& message) {
 	}
 	return result;
 }
+
+bool askUser(const std::string& message) {
+	if (!message.empty())
+		std::cout << message << '\n';
+
+	while (true)
+	{
+		int x{ getUserInput() };
+		switch (x)
+		{
+		case 0:
+			return false;
+		case 1:
+			return true;
+		default:
+			std::cerr << "Invalid input - please try again." << '\n';
+			break;
+		}
+	}
+}
+
+

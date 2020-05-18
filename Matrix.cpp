@@ -20,7 +20,7 @@ MatrixGraph::MatrixGraph(int vertices, int edges) {
 	degree = new int[V]{};
 }
 
-MatrixGraph::MatrixGraph(std::vector<std::pair<int, int>>& data) {
+MatrixGraph::MatrixGraph(const std::vector<std::pair<int, int>>& data) {
 	V = data[0].first;
 	E = data[0].second;
 
@@ -69,7 +69,7 @@ void MatrixGraph::printMatrix() {
 	std::cout << '\n';
 }
 
-// Utility function to check if the 'vertex' can be added at index 'position' (1 to V)
+// Utility function to check if the 'vertex' can be added at index 'position' in the 'path'
 bool MatrixGraph::canBeAdded(int vertex, std::vector<int> &path, int position) {
 	// Check if the vertex is adjacent
 	// to the previous one from the 'path'
@@ -83,7 +83,7 @@ bool MatrixGraph::canBeAdded(int vertex, std::vector<int> &path, int position) {
 			return false;
 		}
 	}
-	// If the 'vertex' can be added at 'position' return true
+	// If the 'vertex' can be added at 'position'
 	return true;
 }
 
@@ -100,7 +100,7 @@ bool MatrixGraph::hamiltonUtil(std::vector<int> &path, int position) {
 		}
 	}
 
-	// For each vertices check if it can be added
+	// For each vertex check if it can be added
 	// Starting from 1, beucase 0 was set as a starting point
 	for (int vertex = 1; vertex < V; ++vertex) {
 		if (canBeAdded(vertex, path, position)) {
@@ -111,7 +111,7 @@ bool MatrixGraph::hamiltonUtil(std::vector<int> &path, int position) {
 				return true;
 			}
 			// If the added vertex does not help with finding the solution remove it
-			path.at(position) = -1;
+			path[position] = -1;
 		}
 	}
 
@@ -163,7 +163,8 @@ bool MatrixGraph::isConnected() {
 	for (int vertex = 0; vertex < V; ++vertex) {
 		std::vector<bool> visited(V, false);
 		DFS(vertex, visited);
-		if (std::find(visited.begin(), visited.end(), false) != visited.end()) {
+		auto connected = std::find(visited.begin(), visited.end(), false);
+		if (connected != visited.end()) {
 			return false;
 		}
 	}
@@ -179,7 +180,7 @@ bool MatrixGraph::isEulerian() {
 	// Undirected graph has Eulerian circuit only if
 	// all the vertices have even degree
 	for (int vertex = 0; vertex < V; ++vertex) {
-		if (degree[vertex] % 2 == 1) {
+		if (degree[vertex] & 1) {
 			return false;
 		}
 	}

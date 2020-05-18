@@ -7,16 +7,43 @@
 
 int main()
 {
-	auto data { loadDataFromFile("data4.txt") };
-	MatrixGraph m(data);
-	ListGraph l(data);
+	if (askUser("Enter user data ? : 1 = yes, 0 = no")) {
+		const auto data = getUserPairs();
 
-	m.printMatrix();
-	m.hamiltonCycle();
-	m.eulerCycle();
+		MatrixGraph m(data);
+		ListGraph l(data);
 
-	l.printSuccList();
-	l.eulerCycle();
+		m.printMatrix();
+		m.eulerCycle();
+		m.hamiltonCycle();
 
+		l.printSuccList();
+		l.eulerCycle();
+		l.hamiltonCycle();
+	}
+
+	if (askUser("Enter file data? : 1 = yes, 0 = no")) {
+		std::string filename;
+		std::cout << "Enter a filename: ";
+		std::cin >> filename;
+
+		// Clear console buffer
+		std::cin.clear();
+		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+		const auto fileData = loadDataFromFile(filename);
+
+		MatrixGraph m(fileData);
+		ListGraph l(fileData);
+
+		m.printMatrix();
+		m.eulerCycle();
+		m.hamiltonCycle();
+
+		l.printSuccList();
+		l.eulerCycle();
+		l.hamiltonCycle();
+	}
+	
 	return 0;
 }
