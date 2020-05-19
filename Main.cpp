@@ -10,16 +10,16 @@ int main()
 	if (askUser("Enter user data ? : 1 = yes, 0 = no")) {
 		const auto data = getUserPairs();
 
-		MatrixGraph m(data);
-		ListGraph l(data);
+		MatrixGraph matrix(data);
+		ListGraph list(data);
 
-		m.printMatrix();
-		m.eulerCycle();
-		m.hamiltonCycle();
+		matrix.printMatrix();
+		matrix.hamiltonCycle();
+		matrix.eulerCycle();
 
-		l.printSuccList();
-		l.eulerCycle();
-		l.hamiltonCycle();
+		list.printSuccList();
+		list.hamiltonCycle();
+		list.eulerCycle();
 	}
 
 	if (askUser("Enter file data? : 1 = yes, 0 = no")) {
@@ -33,16 +33,16 @@ int main()
 
 		const auto fileData = loadDataFromFile(filename);
 
-		MatrixGraph m(fileData);
-		ListGraph l(fileData);
+		MatrixGraph matrix(fileData);
+		ListGraph list(fileData);
 
-		m.printMatrix();
-		m.eulerCycle();
-		m.hamiltonCycle();
+		matrix.printMatrix();
+		matrix.hamiltonCycle();
+		matrix.eulerCycle();
 
-		l.printSuccList();
-		l.eulerCycle();
-		l.hamiltonCycle();
+		list.printSuccList();
+		list.hamiltonCycle();
+		list.eulerCycle();
 	}
 	
 	return 0;

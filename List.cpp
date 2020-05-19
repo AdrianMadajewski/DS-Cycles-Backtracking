@@ -176,9 +176,9 @@ bool ListGraph::eulerCycle() {
 }
 
 bool ListGraph::hasEulerianCircuit() {
-	if (!isConnected()) {
-		return false;
-	}
+	//if (!isConnected()) {
+	//	return false;
+	//}
 		
 	// Has Eulerian circuit if all vertices has the same in/out degree
 	for (int vertex = 0; vertex < V; ++vertex) {

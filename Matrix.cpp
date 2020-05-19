@@ -78,7 +78,7 @@ bool MatrixGraph::canBeAdded(int vertex, std::vector<int> &path, int position) {
 	}
 	// Check if the vertex has already 
 	// been included in the 'path'
-	for (int i = 0; i < position; ++i) {
+	for (int i = 0; i < position; i++) {
 		if (path[i] == vertex) {
 			return false;
 		}
@@ -102,7 +102,8 @@ bool MatrixGraph::hamiltonUtil(std::vector<int> &path, int position) {
 
 	// For each vertex check if it can be added
 	// Starting from 1, beucase 0 was set as a starting point
-	for (int vertex = 1; vertex < V; ++vertex) {
+	for (int vertex = 1; vertex < V; vertex++) {
+
 		if (canBeAdded(vertex, path, position)) {
 			path[position] = vertex;
 
@@ -120,15 +121,18 @@ bool MatrixGraph::hamiltonUtil(std::vector<int> &path, int position) {
 }
 
 bool MatrixGraph::hamiltonCycle() {
-	std::vector<int> path(V, -1);
+	std::vector<int> path(V);
+	for (int i = 0; i < V; ++i) {
+		path[i] = -1;
+	}
 	// Mark path[0] with starting vertex 0
 	path[0] = 0;
 	// Traverse the graph with first empty position set to 1
-	if (!hamiltonUtil(path, 1)) {
+	if (hamiltonUtil(path, 1) == false) {
 		std::cout << "Cannot find Hamiltonian circuit." << '\n';
 		return false;
 	}
-
+	
 	printPathHamilton(path);
 	return true;
 }
@@ -174,9 +178,9 @@ bool MatrixGraph::isConnected() {
 
 bool MatrixGraph::isEulerian() {
 	// Check if the graph is connected
-	if (!isConnected()) {
-		return false;
-	}
+	//if (!isConnected()) {
+	//	return false;
+	//}
 	// Undirected graph has Eulerian circuit only if
 	// all the vertices have even degree
 	for (int vertex = 0; vertex < V; ++vertex) {
